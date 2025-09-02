@@ -1,20 +1,33 @@
 
 # 🔥 Open-dLLM: Open Diffusion Large Language Models
 
-👉 *Train it. Evaluate it. Run it. Reproduce it.*
 
-**Open-dLLM** is the most open release of a diffusion-based large language model to date —  
+
+
+👉 TL;DR: **Open-dLLM** is the most open release of a diffusion-based large language model to date —  
 including **pretraining, evaluation, inference, and checkpoints**.  
 
-This repo introduces **Open-dCoder**, the **code-generation variant** of Open-dLLM.  
+This repo introduces **Open-dCoder**, the **code-generation variant** of Open-dLLM. 
 
----
 
-## 📖 Blog Post
-For a detailed walkthrough of Open-dLLM and its code-generation variant Open-dCoder,  
-see our [blog post on Notion](https://oval-shell-31c.notion.site/Open-Diffusion-Large-Language-Model-25e03bf6136480b7a4ebe3d53be9f68a?pvs=74).
+<p align="center">
+  <a href="https://github.com/pengzhangzhi/Open-dLLM">
+    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="40" alt="GitHub"/>
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://oval-shell-31c.notion.site/Open-Diffusion-Large-Language-Model-25e03bf6136480b7a4ebe3d53be9f68a?pvs=74">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Notion-logo.svg" width="40" alt="Notion"/>
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://huggingface.co/fredzzp/open-dcoder-0.5B">
+    <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" width="40" alt="Hugging Face"/>
+  </a>
+</p>
 
----
+<p align="center">
+  <b>💻 Code</b> &nbsp; | &nbsp; <b>📖 Blog</b> &nbsp; | &nbsp; <b>🤗 Model</b>
+</p>
+
 
 ## 🎥 Demo
 
@@ -62,7 +75,7 @@ Most diffusion LLM repos (e.g., LLaDA, Dream) only release **inference scripts +
 |-------------------------------------------------------------------------|:---:|:-------------:|:---------:|:----------:|:-------:|
 | **Open-dLLM / Open-dCoder (ours)**                                      | ✅  | ✅            | ✅        | ✅         | ✅      |
 | [LLaDA](https://github.com/ML-GSAI/LLaDA)                               | ❌  | ❌            | ✅        | ⚠️ Limited | ✅      |
-| [Dream](https://github.com/HKUNLP/Dream)                                | ❌  | ❌            | ✅        | ✅         | ✅      |
+| [Dream](https://github.com/HKUNLP/Dream)                                | ❌  | ❌            | ✅        | ⚠️ Limited | ✅      |
 | [Gemini-Diffusion](https://deepmind.google/models/gemini-diffusion/)    | ❌  | ❌            | ❌        | ❌         | ❌ (API only) |
 | [Seed Diffusion](https://seed.bytedance.com/seed_diffusion)             | ❌  | ❌            | ❌        | ❌         | ❌ (API only) |
 | [Mercury](https://www.inceptionlabs.ai/introducing-mercury-our-general-chat-model) | ❌  | ❌            | ❌        | ❌         | ❌ (API only) |
@@ -247,3 +260,19 @@ This project builds on incredible prior work:
 
 We stand on the shoulders of these projects, and hope Open-dLLM contributes back to the diffusion LLM community.
 
+
+
+
+## 📚 Citation
+
+If you use **Open-dLLM** or **Open-dCoder** in your research, please cite us:
+
+```bibtex
+@misc{opendllm2025,
+  title        = {Open-dLLM: Open Diffusion Large Language Models},
+  author       = {Fred Zhangzhi Peng, Shuibai Zhang, Alex Tong, and contributors},
+  year         = {2025},
+  howpublished = {\url{https://github.com/pengzhangzhi/Open-dLLM}},
+  note         = {Blog: \url{https://oval-shell-31c.notion.site/Open-Diffusion-Large-Language-Model-25e03bf6136480b7a4ebe3d53be9f68a?pvs=74}, 
+                  Model: \url{https://huggingface.co/fredzzp/open-dcoder-0.5B}}
+}
