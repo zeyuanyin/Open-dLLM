@@ -2,7 +2,7 @@ import torch
 import json
 import os
 import datetime
-from typing import List, Dict, Any
+from typing import List
 from tqdm import tqdm
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
@@ -131,6 +131,7 @@ def eval_infill(
     top_p: float = 0.95,
     alg: str = 'p2',
     alg_temp: float = 0.5,
+    batch_size: int = 32,
     use_ddp: bool = False,
     auto_eval: bool = True,
     use_wandb: bool = True
@@ -157,6 +158,7 @@ def eval_infill(
         'top_p': top_p,
         'alg': alg,
         'alg_temp': alg_temp,
+        'batch_size': batch_size,
         'use_ddp': use_ddp,
         'auto_eval': auto_eval,
         'results_dir': results_dir
@@ -287,6 +289,7 @@ def eval_infill(
         prompts=prefixs_shard,
         middle_lens=middle_lens,
         suffixs=suffixs_shard,
+        batch_size=batch_size,
         steps=steps,
         temperature=temperature,
         top_p=top_p,
@@ -432,6 +435,8 @@ if __name__ == "__main__":
                         help="Sampling algorithm")
     parser.add_argument("--alg_temp", type=float, default=0.5,
                         help="Algorithm temperature for Gumbel noise")
+    parser.add_argument("--batch_size", type=int, default=32,
+                        help="Batch size for inference")
     parser.add_argument("--use_ddp", action="store_true",
                         help="Enable distributed data parallel")
     parser.add_argument("--no_auto_eval", action="store_true",

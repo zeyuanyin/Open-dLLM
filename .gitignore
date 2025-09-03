@@ -2,7 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+=3.1.0
+=15.0.0
 # C extensions
 *.so
 
@@ -125,7 +126,7 @@ generation_config.json
 *.safetensors
 pytorch_model.bin.index.json
 model.safetensors.index.json
-log*
+# log*
 veomni_cli.yaml
 demo.parquet
 
