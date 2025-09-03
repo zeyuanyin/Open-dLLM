@@ -224,7 +224,17 @@ python3 scripts/download_hf_data.py --repo_id fredzzp/fine_code --local_dir ./da
 ### Training
 
 ```bash
-python3 tasks/train_torch.py \
+export TOKENIZERS_PARALLELISM=false
+NNODES=${NNODES:=1}
+NPROC_PER_NODE=4
+NODE_RANK=${NODE_RANK:=0}
+MASTER_ADDR=${MASTER_ADDR:=0.0.0.0}
+MASTER_PORT=${MASTER_PORT:=12345}
+
+
+
+torchrun --nnodes=$NNODES --nproc-per-node $NPROC_PER_NODE --node-rank $NODE_RANK \
+  --master-addr=$MASTER_ADDR --master-port=$MASTER_PORT tasks/train_torch.py \
   configs/pretrain/qwen2_5_coder_500M.yaml \
   --data.train_path=data/data \
   --train.ckpt_manager=dcp \
