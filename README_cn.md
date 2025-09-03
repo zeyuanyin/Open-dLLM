@@ -1,7 +1,9 @@
 # 🔥 Open-dLLM: 开源扩散式大语言模型
 
-👉 TL;DR: **Open-dLLM** 是迄今为止最开放的扩散式大语言模型发布 ——
-我们开源了 **预训练、评测、推理以及模型权重**。
+
+🌍 Languages: [English](README.md) | [中文](README_cn.md)
+
+👉 TL;DR: **Open-dLLM** 是迄今为止最开放的扩散式大语言模型发布 —— 我们开源了 **预训练、评测、推理以及模型权重**。
 
 本仓库介绍了 **Open-dCoder**，它是 Open-dLLM 的 **代码生成版本**。
 
