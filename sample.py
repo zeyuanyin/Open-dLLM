@@ -3,9 +3,9 @@
 import torch
 from transformers import AutoTokenizer
 # Import your custom model class directly
-from veomni.models.transformers.qwen2.modeling_qwen2_temp import Qwen2ForCausalLM
+from veomni.models.transformers.qwen2.modeling_qwen2 import Qwen2ForCausalLM
 # Import the custom generation config
-from veomni.models.transformers.qwen2.generation_utils_temp import MDMGenerationConfig
+from veomni.models.transformers.qwen2.generation_utils import MDMGenerationConfig
 
 # 1. Define paths and parameters
 model_path = "fredzzp/open-dcoder-0.5B" # "logs/Qwen2.5-Coder-0.5B_mdm/checkpoints/global_step_370000/hf_ckpt"
@@ -72,34 +72,3 @@ print("\n--- Prompt ---")
 print(tokenizer.decode(input_ids[0], skip_special_tokens=True))
 print("\n--- Generated Code ---")
 print(generated_text)
-
-
-output_file_path = "generation_output.txt"
-# We need the prompt text again for file writing
-prompt_text = tokenizer.decode(input_ids[0], skip_special_tokens=True)
-
-print(f"\nWriting output to {output_file_path}...")
-with open(output_file_path, "w", encoding="utf-8") as f:
-    # --- Write the Prompt ---
-    f.write("="*25 + " PROMPT " + "="*25 + "\n\n")
-    f.write(prompt_text)
-    f.write("\n\n")
-
-    # --- Write the Final Generated Result ---
-    f.write("="*25 + " FINAL GENERATION " + "="*25 + "\n\n")
-    f.write(generated_text)
-    f.write("\n\n")
-
-    # --- Write the Generation History ---
-    f.write("="*25 + " GENERATION HISTORY " + "="*25 + "\n\n")
-    if hasattr(outputs, 'history') and outputs.history is not None and len(outputs.history) > 0:
-        for i, step_tensor in enumerate(outputs.history):
-            f.write(f"--- Step {i+1} ---\n")
-            # Decode the full sequence tensor at this step to see the progression
-            full_sequence_at_step = tokenizer.decode(step_tensor[0][prompt_len:], skip_special_tokens=True)
-            f.write(full_sequence_at_step)
-            f.write("\n\n")
-    else:
-        f.write("No history was returned. Ensure 'output_history=True' is set in the generation config.\n")
-
-print(f"Successfully wrote results to {output_file_path}")
