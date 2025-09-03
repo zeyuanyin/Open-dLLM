@@ -31,7 +31,7 @@ if tokenizer.mask_token is None:
 
 # 3. Prepare generation config and inputs
 prompt = """
-Write a function to find the top k integers that occur most frequently from given lists of sorted and distinct integers using heap queue algorithm. Your code should pass these tests:\n\nassert func([[1, 2, 6], [1, 3, 4, 5, 7, 8], [1, 3, 5, 6, 8, 9], [2, 5, 7, 11], [1, 4, 7, 8, 12]],3)==[5, 7, 1]\nassert func([[1, 2, 6], [1, 3, 4, 5, 7, 8], [1, 3, 5, 6, 8, 9], [2, 5, 7, 11], [1, 4, 7, 8, 12]],1)==[1]\nassert func([[1, 2, 6], [1, 3, 4, 5, 7, 8], [1, 3, 5, 6, 8, 9], [2, 5, 7, 11], [1, 4, 7, 8, 12]],5)==[6, 5, 7, 8, 1]```python\n
+Write a quick sort algorithm in Python.
 """
 
 input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(device)
@@ -42,8 +42,8 @@ generation_config = MDMGenerationConfig(
     pad_token_id=tokenizer.pad_token_id, # Usually same as eos for decoder-only
     eos_token_id=tokenizer.eos_token_id,
     max_new_tokens=128,
-    steps=500, # Fewer steps for faster inference, increase for quality
-    temperature=0.8, # Increase for more diversity
+    steps=128,
+    temperature=0.5,
     top_k=200,
     alg='p2',
     alg_temp=0.5,
