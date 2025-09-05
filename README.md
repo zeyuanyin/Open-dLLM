@@ -172,15 +172,16 @@ Benchmarks include: **HumanEval / HumanEval+**, **MBPP / MBPP+**, **HumanEval-In
 
 #### Code Infilling
 
-| Method                       | HumanEval Infill Pass\@1 | SantaCoder Exact Match |
-| ---------------------------- | ------------------------ | ---------------------- |
-| LLaDA-8B                     | 48.3                     | 35.1                   |
-| Dream-7B                     | 39.4                     | 40.7                   |
-| DiffuCoder-7B                | 54.8                     | 38.8                   |
-| Dream-Coder-7B               | 55.3                     | 40.0                   |
-| **Open-dCoder (0.5B, Ours)** | **77.4**                 | **56.4**               |
+| Method                                | HumanEval Infill Pass@1 | SantaCoder Exact Match |
+| ------------------------------------- | ----------------------: | ---------------------: |
+| LLaDA-8B                              |                    48.3 |                  35.1  |
+| Dream-7B                              |                    39.4 |                  40.7  |
+| DiffuCoder-7B                         |                    54.8 |                  38.8  |
+| Dream-Coder-7B                        |                    55.3 |                  40.0  |
+| **Open-dCoder (0.5B, Ours)**          |                    32.5 |                  29.6  |
+| **Open-dCoder (0.5B, Ours)** Oracle Length |               77.4 |                  56.4  |
 
-> *Open-dCoder significantly outperforms larger diffusion LLMs on code infilling.*
+> *We followed the average fixed length evaluation setting in [DreamOn](https://hkunlp.github.io/blog/2025/dreamon/) to get the results.*
 
 ---
 
