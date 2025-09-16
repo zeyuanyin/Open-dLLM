@@ -1,8 +1,7 @@
 
 # 🔥 Open-dLLM: Open Diffusion Large Language Models
 
-
-
+🌍 Languages: [English](README.md) | [中文](README_cn.md)
 
 👉 TL;DR: **Open-dLLM** is the most open release of a diffusion-based large language model to date —  
 including **pretraining, evaluation, inference, and checkpoints**.  
@@ -102,7 +101,7 @@ pip install --upgrade --no-cache-dir \
   tensordict torchdata byte-flux triton>=3.1.0 \
   transformers==4.54.1 accelerate datasets peft hf-transfer \
   codetiming hydra-core pandas pyarrow>=15.0.0 pylatexenc \
-  wandb ninja liger-kernel \
+  wandb ninja liger-kernel==0.5.8 \
   pytest yapf py-spy pyext pre-commit ruff packaging
 
 pip install -e .
@@ -161,8 +160,8 @@ Benchmarks include: **HumanEval / HumanEval+**, **MBPP / MBPP+**, **HumanEval-In
 | Method                       | HumanEval |          | HumanEval+ |          | MBPP     |          | MBPP+    |          |
 | ---------------------------- | --------- | -------- | ---------- | -------- | -------- | -------- | -------- | -------- |
 |                              | Pass\@1   | Pass\@10 | Pass\@1    | Pass\@10 | Pass\@1  | Pass\@10 | Pass\@1  | Pass\@10 |
-| LLaDA (8B)                   | 35.4      | 50.0     | 30.5       | 43.3     | 50.1     | 53.4        | 42.1     | 69.1        |
-| Dream (7B)                   | 56.7      | 59.2     | 50.0       | 53.7     | 68.7     | –        | 57.4     | 72.5        |
+| LLaDA (8B)                   | 35.4      | 50.0     | 30.5       | 43.3     | 38.8     | 53.4        | 52.6     | 69.1        |
+| Dream (7B)                   | 56.7      | 59.2     | 50.0       | 53.7     | 55.4     | 56.2        | 71.5     | 72.5        |
 | Mask DFM (1.3B)              | 9.1       | 17.6     | 7.9        | 13.4     | 6.2      | 25.0     | –        | –        |
 | Edit Flow (1.3B)             | 12.8      | 24.3     | 10.4       | 20.7     | 10.0     | 36.4     | –        | –        |
 | **Open-dCoder (0.5B, Ours)** | **20.8**  | **38.4** | **17.6**   | **35.2** | **16.7** | **38.4** | **23.9** | **53.6** |
@@ -173,15 +172,16 @@ Benchmarks include: **HumanEval / HumanEval+**, **MBPP / MBPP+**, **HumanEval-In
 
 #### Code Infilling
 
-| Method                       | HumanEval Infill Pass\@1 | SantaCoder Exact Match |
-| ---------------------------- | ------------------------ | ---------------------- |
-| LLaDA-8B                     | 48.3                     | 35.1                   |
-| Dream-7B                     | 39.4                     | 40.7                   |
-| DiffuCoder-7B                | 54.8                     | 38.8                   |
-| Dream-Coder-7B               | 55.3                     | 40.0                   |
-| **Open-dCoder (0.5B, Ours)** | **77.4**                 | **56.4**               |
+| Method                                | HumanEval Infill Pass@1 | SantaCoder Exact Match |
+| ------------------------------------- | ----------------------: | ---------------------: |
+| LLaDA-8B                              |                    48.3 |                  35.1  |
+| Dream-7B                              |                    39.4 |                  40.7  |
+| DiffuCoder-7B                         |                    54.8 |                  38.8  |
+| Dream-Coder-7B                        |                    55.3 |                  40.0  |
+| **Open-dCoder (0.5B, Ours)**          |                    32.5 |                  29.6  |
+| **Open-dCoder (0.5B, Ours)** Oracle Length |               77.4 |                  56.4  |
 
-> *Open-dCoder significantly outperforms larger diffusion LLMs on code infilling.*
+> *We followed the average fixed length evaluation setting in [DreamOn](https://hkunlp.github.io/blog/2025/dreamon/) to get the results.*
 
 ---
 
@@ -224,7 +224,17 @@ python3 scripts/download_hf_data.py --repo_id fredzzp/fine_code --local_dir ./da
 ### Training
 
 ```bash
-python3 tasks/train_torch.py \
+export TOKENIZERS_PARALLELISM=false
+NNODES=${NNODES:=1}
+NPROC_PER_NODE=4
+NODE_RANK=${NODE_RANK:=0}
+MASTER_ADDR=${MASTER_ADDR:=0.0.0.0}
+MASTER_PORT=${MASTER_PORT:=12345}
+
+
+
+torchrun --nnodes=$NNODES --nproc-per-node $NPROC_PER_NODE --node-rank $NODE_RANK \
+  --master-addr=$MASTER_ADDR --master-port=$MASTER_PORT tasks/train_torch.py \
   configs/pretrain/qwen2_5_coder_500M.yaml \
   --data.train_path=data/data \
   --train.ckpt_manager=dcp \
