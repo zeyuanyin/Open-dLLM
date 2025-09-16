@@ -225,41 +225,57 @@ class MDMGenerationMixin:
                 x[mask_index] = x0
 
             elif alg == "p2":
-                # Step fraction for linear kappa schedule
+                # Use sample_tokens to obtain confidence and candidate tokens for the whole sequence
+                # kappa_t: fraction of tokens to keep unmasked (can be replaced with custom schedule)
                 kappa_t = (i + 1) / steps
 
-                # Predict tokens + confidence
-                confidence, x0 = sample_tokens(mask_logits, temperature, top_p, top_k, alg=alg)
+                # Compute confidence and sampled tokens for the entire sequence:
+                #   conf_full: [B, L], confidence of the sampled token at each position
+                #   x0_full:  [B, L], sampled token IDs for each position
+                conf_full, x0_full = sample_tokens(
+                    logits, temperature=temperature, top_p=top_p, top_k=top_k, alg=alg
+                )
 
-                # Scatter confidence back to full sequence
-                full_conf = torch.full_like(x, float("inf"), dtype=confidence.dtype)
-                full_conf[mask_index] = confidence
-
-                # Do not consider fixed tokens when remasking
+                # Construct full_conf matrix and mask out fixed positions
+                # Only positions in (~fix_mask) are candidates for masking/unmasking
+                full_conf = conf_full.clone()
                 full_conf[fix_mask] = float("inf")
+                # Prevent NaNs or extreme values from interfering
+                full_conf = torch.where(
+                    torch.isfinite(full_conf), full_conf, torch.full_like(full_conf, float("inf"))
+                )
 
-                # How many to keep unmasked = kappa_t, so (1 - kappa_t) will be remasked
-                num_positions = (~fix_mask).sum(dim=1, keepdim=True)  # only non-fixed tokens
-                num_to_mask = (num_positions.float() * (1 - kappa_t)).long()
+                # Calculate how many positions to re-mask per sample
+                # = number of variable positions * (1 - kappa_t)
+                num_positions = (~fix_mask).sum(dim=1)  # [B]
+                num_to_mask = (num_positions.float() * (1.0 - kappa_t)).floor().to(torch.long)
+                # Boundaries: at least 0, at most total number of variable positions
+                num_to_mask = num_to_mask.clamp_min(0)
+                num_to_mask = torch.minimum(num_to_mask, num_positions)
 
-                # Sort confidence ascending → lowest first
-                sorted_idx = torch.argsort(full_conf, dim=-1, descending=False)
-                max_mask = num_to_mask.max()
-                arange_mask = torch.arange(max_mask, device=x.device).unsqueeze(0) < num_to_mask
-                to_mask_idx = sorted_idx[:, :max_mask][arange_mask]
+                # Select the lowest-confidence positions within (~fix_mask) for re-masking
+                sorted_idx = torch.argsort(full_conf, dim=1, descending=False)  # [B, L]
+                max_k = int(num_to_mask.max().item())
+                if max_k > 0:
+                    topk_idx = sorted_idx[:, :max_k]  # [B, max_k]
+                    row_mask = torch.arange(max_k, device=x.device).unsqueeze(0) < num_to_mask.unsqueeze(1)  # [B, max_k]
 
-                to_mask = torch.zeros_like(x, dtype=torch.bool)
-                batch_idx = torch.arange(x.size(0), device=x.device).unsqueeze(1).expand(-1, max_mask)[arange_mask]
-                to_mask[batch_idx, to_mask_idx] = True
+                    to_mask = torch.zeros_like(x, dtype=torch.bool)
+                    batch_arange = torch.arange(x.size(0), device=x.device).unsqueeze(1).expand_as(topk_idx)  # [B, max_k]
+                    valid_batch = batch_arange[row_mask]  # [sum_k]
+                    valid_col   = topk_idx[row_mask]      # [sum_k]
+                    to_mask[valid_batch, valid_col] = True
+                else:
+                    to_mask = torch.zeros_like(x, dtype=torch.bool)
 
-                # Apply remasking
+                # Apply re-masking: set selected positions back to mask_token_id
                 x[to_mask] = mask_token_id
 
-                # Unmask masked positions that are *not* in the lowest-confidence set
-                mask_candidates = mask_index & ~to_mask
-                x_unmasked_proposals = torch.full_like(x, fill_value=mask_token_id)
-                x_unmasked_proposals[mask_index] = x0
-                x[mask_candidates] = x_unmasked_proposals[mask_candidates]
+                # For positions that started as mask and were not re-masked, unmask them with sampled tokens
+                keep_unmask = mask_index & (~to_mask)
+                x[keep_unmask] = x0_full[keep_unmask]
+                
+
 
             elif alg in ["maskgit_plus", "entropy", "topk_margin"]:
                 # Confidence-based sampling (maskgit, entropy, etc.)
