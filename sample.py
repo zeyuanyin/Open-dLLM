@@ -31,8 +31,10 @@ if tokenizer.mask_token is None:
 
 # 3. Prepare generation config and inputs
 prompt = """
-Write a quick sort algorithm in Python.
+Write a Python function to implement quick sort algorithm.
 """
+
+# prompt = "Write a Python function to return the n-th fibonacci number."
 
 input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(device)
 
@@ -72,3 +74,7 @@ print("\n--- Prompt ---")
 print(tokenizer.decode(input_ids[0], skip_special_tokens=True))
 print("\n--- Generated Code ---")
 print(generated_text)
+
+# Save the generated text to a file
+with open("generated_text.txt", "w") as f:
+    f.write(generated_text)
